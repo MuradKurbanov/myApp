@@ -23,7 +23,6 @@ export default class App extends Component<Props> {
     return (
       <View style={styles.container}>
          <MapView
-           provider={PROVIDER_GOOGLE} // remove if not using Google Maps
            style={styles.map}
            region={{
              latitude: 37.78825,
