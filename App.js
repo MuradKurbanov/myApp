@@ -8,7 +8,7 @@
 
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View} from 'react-native';
-import MapView from 'react-native-maps';
+import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -23,6 +23,7 @@ export default class App extends Component<Props> {
     return (
       <View style={styles.container}>
          <MapView
+           provider={PROVIDER_GOOGLE}
            style={styles.map}
            region={{
              latitude: 37.78825,
@@ -32,6 +33,7 @@ export default class App extends Component<Props> {
            }}
          >
          </MapView>
+         <Text>Hello world</Text>
      </View>
     );
   }
