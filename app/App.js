@@ -6,7 +6,7 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 // import axios from 'axios';
 // import axiosMiddleware from 'redux-axios-middleware';
 import reducer from './reducers';
-import MapPage from './components/mapPage/MapPage';
+import {MapPage} from './components/mapPage/MapPage';
 
 // const client = axios.create({
 //   baseURL: 'https://api.github.com',
