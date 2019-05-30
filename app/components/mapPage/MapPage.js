@@ -1,38 +1,107 @@
-import React, { Component } from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import React from 'react';
+import { StyleSheet, Text, View, Image} from 'react-native';
+import {Button} from '../common/button/Button';
+import {PopUpManager} from '../common/popUpManager/PopUpManager';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+import { Marker } from 'react-native-maps';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { addListMarkers } from '../../reducers/stateMap';
+import { showPopUpManager } from '../../reducers/stateCommon';
+import { Dimensions } from "react-native";
 
+const width = Dimensions.get('window').width;
+const height = Dimensions.get('window').height;
 
-export default class MapPage extends Component {
+const styles = StyleSheet.create({
+  container: {
+    ...StyleSheet.absoluteFillObject,
+    height: height,
+    width: width,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  map: {
+    position: 'relative',
+    height: height,
+    width: width,
+  },
+  imgMarker: {
+    width: 85,
+    height: 120,
+    position: 'absolute',
+    top: 300,
+    right: 145,
+  }
+});
+
+class MapPage extends React.Component {
+  state = {
+    addMarker: false
+  }
+  addCoordinate = null;
+
+  handlerPressAdd = () => this.setState({addMarker: true})
+
+  handlerPressСonfirm = () => {
+    const { showPopUpManager, addListMarkers } = this.props;
+    this.setState({addMarker: false});
+    addListMarkers(this.addCoordinate);
+    showPopUpManager('addEvent');
+  }
+
+  updateLocation = (e) => this.state.addMarker ? this.addCoordinate = e : null;
+
+  imgMarker =
+    <Image
+      style={styles.imgMarker}
+      source={require('../../../images/location-marker.png')}
+    />
+
   render() {
+    const { stateMap, popUpManager } = this.props;
+    const { addMarker } = this.state;
     return (
       <View style={styles.container}>
-         <MapView
+        <MapView
            provider={PROVIDER_GOOGLE}
            style={styles.map}
-           region={{
-             latitude: 37.78825,
-             longitude: -122.4324,
-             latitudeDelta: 0.015,
-             longitudeDelta: 0.0121,
-           }}
-         >
-         </MapView>
-         <Text>HI</Text>
-     </View>
+           region={stateMap[0]}
+           onRegionChange={region => this.updateLocation(region)}
+           showsUserLocation
+        >
+          {!addMarker &&
+           stateMap.map((marker, i) => <Marker coordinate={marker} key={i} />)}
+        </MapView>
+        {addMarker && this.imgMarker}
+        {!addMarker ?
+          <Button
+            btnStyle={'newMarkerBtn'}
+            textStyle={'newMarkerTitle'}
+            text={'+'}
+            onPress={this.handlerPressAdd}
+          /> :
+          <Button
+           btnStyle={'confirmLocationBtn'}
+           textStyle={'titleСonfirm'}
+           text={'Подтвердить'}
+           onPress={this.handlerPressСonfirm}
+          />}
+          { popUpManager &&
+            <PopUpManager />
+          }
+      </View>
     )
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-   ...StyleSheet.absoluteFillObject,
-   height: 800,
-   width: 400,
-   justifyContent: 'flex-end',
-   alignItems: 'center',
-  },
-  map: {
-   ...StyleSheet.absoluteFillObject,
- },
-});
+const mapStateToProps = state => { return {
+  stateMap: state.stateMap.markerList,
+  popUpManager: state.stateCommon.popUpManager
+}}
+
+const mapDispatchToProps = dispatch => bindActionCreators({ addListMarkers, showPopUpManager }, dispatch);
+
+const connectedContainer = connect(mapStateToProps, mapDispatchToProps)(MapPage);
+
+export { connectedContainer as MapPage };

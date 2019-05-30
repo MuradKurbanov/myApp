@@ -1,6 +1,8 @@
 import { combineReducers } from 'redux';
-import { MarkerList } from './markerList/MarkerList';
+import { stateMap } from './stateMap';
+import { stateCommon } from './stateCommon';
 
 export default combineReducers({
-  MarkerList,
+  stateMap,
+  stateCommon
 })
