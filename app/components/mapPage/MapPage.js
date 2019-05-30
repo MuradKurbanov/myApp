@@ -1,31 +1,37 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image} from 'react-native';
 import {Button} from '../common/button/Button';
+import {PopUpManager} from '../common/popUpManager/PopUpManager';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import { Marker } from 'react-native-maps';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { addListMarkers } from '../../reducers/stateMap';
+import { showPopUpManager } from '../../reducers/stateCommon';
+import { Dimensions } from "react-native";
+
+const width = Dimensions.get('window').width;
+const height = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
-    height: 800,
-    width: 380,
+    height: height,
+    width: width,
     justifyContent: 'flex-end',
     alignItems: 'center',
   },
   map: {
     position: 'relative',
-    height: 800,
-    width: 380,
+    height: height,
+    width: width,
   },
   imgMarker: {
-    width: 67,
-    height: 100,
+    width: 85,
+    height: 120,
     position: 'absolute',
     top: 300,
-    right: 170,
+    right: 145,
   }
 });
 
@@ -38,8 +44,10 @@ class MapPage extends React.Component {
   handlerPressAdd = () => this.setState({addMarker: true})
 
   handlerPressСonfirm = () => {
+    const { showPopUpManager, addListMarkers } = this.props;
     this.setState({addMarker: false});
-    this.props.addListMarkers(this.addCoordinate);
+    addListMarkers(this.addCoordinate);
+    showPopUpManager('addEvent');
   }
 
   updateLocation = (e) => this.state.addMarker ? this.addCoordinate = e : null;
@@ -51,7 +59,7 @@ class MapPage extends React.Component {
     />
 
   render() {
-    const { stateMap } = this.props;
+    const { stateMap, popUpManager } = this.props;
     const { addMarker } = this.state;
     return (
       <View style={styles.container}>
@@ -79,14 +87,20 @@ class MapPage extends React.Component {
            text={'Подтвердить'}
            onPress={this.handlerPressСonfirm}
           />}
+          { popUpManager &&
+            <PopUpManager />
+          }
       </View>
     )
   }
 }
 
-const mapStateToProps = state => { return { stateMap: state.stateMap.markerList }}
+const mapStateToProps = state => { return {
+  stateMap: state.stateMap.markerList,
+  popUpManager: state.stateCommon.popUpManager
+}}
 
-const mapDispatchToProps = dispatch => bindActionCreators({ addListMarkers }, dispatch);
+const mapDispatchToProps = dispatch => bindActionCreators({ addListMarkers, showPopUpManager }, dispatch);
 
 const connectedContainer = connect(mapStateToProps, mapDispatchToProps)(MapPage);
 
