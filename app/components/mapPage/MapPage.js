@@ -10,6 +10,8 @@ import { addListMarkers } from '../../reducers/stateMap';
 import { showPopUpManager } from '../../reducers/stateCommon';
 import { Dimensions } from "react-native";
 
+import { LoginManager } from "react-native-fbsdk";
+
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
@@ -41,7 +43,24 @@ class MapPage extends React.Component {
   }
   addCoordinate = null;
 
-  handlerPressAdd = () => this.setState({addMarker: true})
+  handlerPressAdd = () => {
+    LoginManager.logInWithReadPermissions(["public_profile", "email"]).then(
+      function(result) {
+        if (result.isCancelled) {
+          console.log("Login cancelled");
+        } else {
+          console.log(
+            "Login success with permissions: " +
+              result.grantedPermissions.toString()
+          );
+        }
+      },
+      function(error) {
+        console.log("Login fail with error: " + error);
+      }
+    );
+    // this.setState({addMarker: true})
+  }
 
   handlerPressСonfirm = () => {
     const { showPopUpManager, addListMarkers } = this.props;
